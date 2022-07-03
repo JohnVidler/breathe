@@ -2189,7 +2189,10 @@ class SphinxRenderer:
         typ = "".join(n.astext() for n in self.render(node.get_type()))
         # in Doxygen < 1.9 the 'friend' part is there, but afterwards not
         # https://github.com/michaeljones/breathe/issues/616
-        assert typ in ("friend class", "friend struct", "class", "struct")
+        if typ.startswith("const ") and typ.endswith("&"):
+            self.state.document.reporter.warning( F"Type = '{typ}' is likely a forward declaration for a later class, continuing..." )
+        else:
+            assert typ in ("friend class", "friend struct", "class", "struct")
         if not typ.startswith("friend "):
             typ = "friend " + typ
         signode += addnodes.desc_annotation(typ, typ)
