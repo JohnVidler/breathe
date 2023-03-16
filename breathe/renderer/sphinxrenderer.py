@@ -649,10 +649,10 @@ class SphinxRenderer:
         node,
         declaration: str,
         *,
-        obj_type: str = None,
-        content_callback: ContentCallback = None,
-        display_obj_type: str = None,
-        declarator_callback: DeclaratorCallback = None,
+        obj_type: Optional[str] = None,
+        content_callback: Optional[ContentCallback] = None,
+        display_obj_type: Optional[str] = None,
+        declarator_callback: Optional[DeclaratorCallback] = None,
         options={},
     ) -> List[Node]:
         if obj_type is None:
@@ -1399,7 +1399,12 @@ class SphinxRenderer:
         node_list.extend(self.render_optional(node.description))
 
         # Get all the memberdef info
-        node_list.extend(self.render_iterable(node.memberdef))
+        if "sort" in options:
+            member_def = sorted(node.memberdef, key=lambda x: x.name)
+        else:
+            member_def = node.memberdef
+
+        node_list.extend(self.render_iterable(member_def))
 
         if node_list:
             if "members-only" in options:
@@ -1501,6 +1506,23 @@ class SphinxRenderer:
                 nodelist.append(deflist)
             nodelist.extend(paramList)
             nodelist.extend(fields)
+
+        # And now all kinds of cleanup steps
+        # ----------------------------------
+
+        # trim trailing whitespace
+        while len(nodelist) != 0:
+            last = nodelist[-1]
+            if not isinstance(last, nodes.Text):
+                break
+            if last.astext().strip() != "":
+                break
+            nodelist.pop()
+
+        # https://github.com/michaeljones/breathe/issues/827
+        # verbatim nodes should not be in a paragraph:
+        if len(nodelist) == 1 and isinstance(nodelist[0], nodes.literal_block):
+            return nodelist
 
         return [nodes.paragraph("", "", *nodelist)]
 

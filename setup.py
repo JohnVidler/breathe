@@ -10,17 +10,17 @@ except ImportError:
 import sys
 
 # Keep in sync with breathe/__init__.py __version__
-__version__ = "4.34.0"
+__version__ = "4.35.0"
 
 long_desc = """
 Breathe is an extension to reStructuredText and Sphinx to be able to read and
  render `Doxygen <http://www.doxygen.org>`__ xml output.
 """
 
-requires = ["Sphinx>=4.0,<6,!=5.0.0", "docutils>=0.12"]
+requires = ["Sphinx>=4.0,!=5.0.0", "docutils>=0.12"]
 
-if sys.version_info < (3, 6):
-    print("ERROR: Sphinx requires at least Python 3.6 to run.")
+if sys.version_info < (3, 7):
+    print("ERROR: Sphinx requires at least Python 3.7 to run.")
     sys.exit(1)
 
 
@@ -39,6 +39,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Environment :: Web Environment",
+        "Framework :: Sphinx :: Extension",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "License :: OSI Approved :: BSD License",
